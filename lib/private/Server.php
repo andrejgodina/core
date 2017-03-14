@@ -69,6 +69,7 @@ use OC\Lock\NoopLockingProvider;
 use OC\Mail\Mailer;
 use OC\Memcache\ArrayCache;
 use OC\Notification\Manager;
+use OC\OCS\Exception;
 use OC\Security\CertificateManager;
 use OC\Security\CSP\ContentSecurityPolicyManager;
 use OC\Security\Crypto;
@@ -917,7 +918,13 @@ class Server extends ServerContainer implements IServerContainer {
 			$userId = $user->getUID();
 		}
 		$root = $this->getRootFolder();
-		return $root->getUserFolder($userId);
+		$userFolder = $root->getUserFolder($userId);
+
+		if (is_null($userFolder)) {
+			throw new Exception("User Folder cannot be null if session exists");
+		}
+
+		return $userFolder;
 	}
 
 	/**
